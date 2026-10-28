@@ -1,7 +1,7 @@
 package supplier
 
 import (
-	"catalog/thirt_part/supplier/dto"
+	dto_fake "catalog/thirt_part/supplier/dto"
 )
 
 type FakeSupplier struct{}
@@ -20,7 +20,7 @@ func (f *FakeSupplier) FetchBatchManifest(updateID string) ([]string, error) {
 	}, nil
 }
 
-func (f *FakeSupplier) FetchBatch(batchID string) ([]dto.BatchItem, error) {
+func (f *FakeSupplier) FetchBatch(batchID string) ([]dto_fake.BatchItem, error) {
 	return generateBatch(batchID), nil
 }
 
@@ -32,7 +32,7 @@ type productTemplate struct {
 	category string
 }
 
-func generateBatch(batchID string) []dto.BatchItem {
+func generateBatch(batchID string) []dto_fake.BatchItem {
 	switch batchID {
 	case "batch-001":
 		return batch1()
@@ -50,7 +50,7 @@ func generateBatch(batchID string) []dto.BatchItem {
 }
 
 // batch1: 10 new products (version 1)
-func batch1() []dto.BatchItem {
+func batch1() []dto_fake.BatchItem {
 	products := []productTemplate{
 		{"PROD-001", "Wireless Mouse", "Ergonomic wireless mouse with USB receiver", 2999, "Electronics"},
 		{"PROD-002", "USB-C Cable", "Braided USB-C to USB-A cable, 2m", 1299, "Electronics"},
@@ -63,9 +63,9 @@ func batch1() []dto.BatchItem {
 		{"PROD-009", "Cotton T-Shirt", "Plain cotton crew neck, assorted colors", 1499, "Clothing"},
 		{"PROD-010", "Drill Bit Set", "HSS drill bits, 1-13mm, 25 pieces", 2499, "Tools"},
 	}
-	items := make([]dto.BatchItem, len(products))
+	items := make([]dto_fake.BatchItem, len(products))
 	for i, p := range products {
-		items[i] = dto.BatchItem{
+		items[i] = dto_fake.BatchItem{
 			ProductID:   p.id,
 			Name:        p.name,
 			Description: p.desc,
@@ -79,8 +79,8 @@ func batch1() []dto.BatchItem {
 }
 
 // batch2: Updates to some existing products (version 2) + new products
-func batch2() []dto.BatchItem {
-	return []dto.BatchItem{
+func batch2() []dto_fake.BatchItem {
+	return []dto_fake.BatchItem{
 		// Price update for existing products
 		{ProductID: "PROD-001", Name: "Wireless Mouse", Description: "Ergonomic wireless mouse with USB receiver", Price: 2499, Category: "Electronics", Version: 2, Withdrawn: false},
 		{ProductID: "PROD-006", Name: "Organic Coffee Beans", Description: "Single-origin Arabica, 1kg bag - new harvest", Price: 2099, Category: "Food", Version: 2, Withdrawn: false},
@@ -96,8 +96,8 @@ func batch2() []dto.BatchItem {
 }
 
 // batch3: Withdrawals + out-of-order versions
-func batch3() []dto.BatchItem {
-	return []dto.BatchItem{
+func batch3() []dto_fake.BatchItem {
+	return []dto_fake.BatchItem{
 		// Withdraw PROD-004 (keyboard discontinued)
 		{ProductID: "PROD-004", Name: "Mechanical Keyboard", Description: "Cherry MX Brown mechanical keyboard", Price: 8999, Category: "Electronics", Version: 3, Withdrawn: true},
 		// Withdraw PROD-009 (t-shirt discontinued)
@@ -112,8 +112,8 @@ func batch3() []dto.BatchItem {
 }
 
 // batch4: More updates + attempt to un-withdraw with old version (should fail)
-func batch4() []dto.BatchItem {
-	return []dto.BatchItem{
+func batch4() []dto_fake.BatchItem {
+	return []dto_fake.BatchItem{
 		// Try to restore PROD-004 with version 2 (older than withdrawal at version 3 — should be skipped)
 		{ProductID: "PROD-004", Name: "Mechanical Keyboard", Description: "Cherry MX Brown mechanical keyboard", Price: 7999, Category: "Electronics", Version: 2, Withdrawn: false},
 		// Legitimately restore PROD-009 with version 3 (newer than withdrawal at version 2)
@@ -126,8 +126,8 @@ func batch4() []dto.BatchItem {
 }
 
 // batch5: Final batch — price updates, new products, duplicate of earlier batch item
-func batch5() []dto.BatchItem {
-	return []dto.BatchItem{
+func batch5() []dto_fake.BatchItem {
+	return []dto_fake.BatchItem{
 		// Price updates
 		{ProductID: "PROD-002", Name: "USB-C Cable", Description: "Braided USB-C to USB-A cable, 2m - improved strain relief", Price: 1099, Category: "Electronics", Version: 2, Withdrawn: false},
 		{ProductID: "PROD-007", Name: "Hex Key Set", Description: "Metric hex key set, 1.5-10mm, with holder", Price: 1799, Category: "Tools", Version: 2, Withdrawn: false},

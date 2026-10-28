@@ -1,22 +1,4 @@
-package dto
-
-import "time"
-
-type BatchStatus string
-
-const (
-	BatchPending   BatchStatus = "pending"
-	BatchCompleted BatchStatus = "completed"
-	BatchFailed    BatchStatus = "failed"
-)
-
-type Batch struct {
-	ID          string
-	UpdateID    string
-	Status      BatchStatus
-	Error       string
-	ProcessedAt *time.Time
-}
+package dto_fake
 
 type BatchItem struct {
 	ProductID   string
