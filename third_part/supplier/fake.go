@@ -1,7 +1,7 @@
 package supplier
 
 import (
-	dto_fake "catalog/thirt_part/supplier/dto"
+	dto_fake "catalog/third_part/supplier/dto"
 )
 
 type FakeSupplier struct{}

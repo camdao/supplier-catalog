@@ -1,6 +1,6 @@
 package supplier
 
-import dto_fake "catalog/thirt_part/supplier/dto"
+import dto_fake "catalog/third_part/supplier/dto"
 
 type Supplier interface {
 	FetchBatchManifest(updateID string) ([]string, error)

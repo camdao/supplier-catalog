@@ -4,7 +4,7 @@ import (
 	"catalog/global"
 	"catalog/internal/model"
 	"catalog/internal/repo"
-	dto_fake "catalog/thirt_part/supplier/dto"
+	dto_fake "catalog/third_part/supplier/dto"
 	"database/sql"
 	"errors"
 	"testing"

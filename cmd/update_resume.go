@@ -3,7 +3,7 @@ package cmd
 import (
 	"catalog/internal/dto"
 	"catalog/internal/service"
-	"catalog/thirt_part/supplier"
+	"catalog/third_part/supplier"
 	"fmt"
 
 	"github.com/spf13/cobra"
