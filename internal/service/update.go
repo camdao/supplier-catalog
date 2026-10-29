@@ -153,6 +153,7 @@ func (e *UpdateService) processBatches(
 
 		if skipped {
 			result.BatchesSkipped++
+			continue
 		}
 
 		if changes == nil {
@@ -195,7 +196,7 @@ func (e *UpdateService) processSingleBatch(
 		return nil, false, nil
 	}
 
-	changes, err := e.Repo.BeginBatch(
+	changes, err := ProcessBatchItems(
 		updateID,
 		batchID,
 		toModelItems(items),

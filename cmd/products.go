@@ -23,7 +23,7 @@ var productsListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List products in the catalog",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		svc := service.NewProductsService()
+		svc := service.NewProductService()
 
 		products, err := svc.ListProducts(productCategory, productShowWithdrawn)
 		if err != nil {
@@ -58,7 +58,7 @@ var productsShowCmd = &cobra.Command{
 	Short: "Show details for a single product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		svc := service.NewProductsService()
+		svc := service.NewProductService()
 
 		p, err := svc.GetProduct(args[0])
 		if err != nil {
