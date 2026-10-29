@@ -35,6 +35,29 @@ func (s *UpdateService) GetLatestUpdate() (*model.Update, error) {
 func (s *UpdateService) ListBatches(updateID string) ([]model.Batch, error) {
 	return s.Repo.ListBatches(updateID)
 }
+
+func (s *UpdateService) ResumeUpdate() (*dto.UpdateResult, error) {
+	update, err := s.Repo.GetInProgressUpdate()
+	if err != nil {
+		return nil, fmt.Errorf("get in-progress update: %w", err)
+	}
+	if update == nil {
+		return nil, fmt.Errorf("no update in progress to resume")
+	}
+
+	batches, err := s.Repo.ListBatches(update.ID)
+	if err != nil {
+		return nil, fmt.Errorf("list batches: %w", err)
+	}
+
+	batchIDs := make([]string, 0, len(batches))
+	for _, b := range batches {
+		batchIDs = append(batchIDs, b.ID)
+	}
+
+	fmt.Printf("Resuming update %s with %d batches...\n", update.ID, len(batchIDs))
+	return s.processBatches(update.ID, batchIDs)
+}
 func (e *UpdateService) StartUpdate() (*dto.UpdateResult, error) {
 	if err := e.checkInProgressUpdate(); err != nil {
 		return nil, err
