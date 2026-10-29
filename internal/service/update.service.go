@@ -23,6 +23,18 @@ func NewUpdateService(sup supplier.Supplier) *UpdateService {
 		Repo:     repo.NewUpdateRepo(),
 	}
 }
+
+func (s *UpdateService) GetInProgressUpdate() (*model.Update, error) {
+	return s.Repo.GetInProgressUpdate()
+}
+
+func (s *UpdateService) GetLatestUpdate() (*model.Update, error) {
+	return s.Repo.GetLatestUpdate()
+}
+
+func (s *UpdateService) ListBatches(updateID string) ([]model.Batch, error) {
+	return s.Repo.ListBatches(updateID)
+}
 func (e *UpdateService) StartUpdate() (*dto.UpdateResult, error) {
 	if err := e.checkInProgressUpdate(); err != nil {
 		return nil, err

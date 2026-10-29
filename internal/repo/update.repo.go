@@ -32,6 +32,84 @@ func (r *UpdateRepostruct) HasInProgressUpdate() (bool, error) {
 
 	return exists, nil
 }
+
+func (r *UpdateRepostruct) GetInProgressUpdate() (*model.Update, error) {
+	var u model.Update
+	var completedAt sql.NullTime
+	err := global.DB.QueryRow(`
+		SELECT id, status, total_batches, started_at, completed_at
+		FROM updates
+		WHERE status = ?
+		ORDER BY started_at DESC
+		LIMIT 1
+	`, "in_progress").Scan(&u.ID, &u.Status, &u.TotalBatches, &u.StartedAt, &completedAt)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if completedAt.Valid {
+		u.CompletedAt = &completedAt.Time
+	}
+	return &u, nil
+}
+
+func (r *UpdateRepostruct) GetLatestUpdate() (*model.Update, error) {
+	var u model.Update
+	var completedAt sql.NullTime
+	err := global.DB.QueryRow(`
+		SELECT id, status, total_batches, started_at, completed_at
+		FROM updates
+		ORDER BY started_at DESC
+		LIMIT 1
+	`).Scan(&u.ID, &u.Status, &u.TotalBatches, &u.StartedAt, &completedAt)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if completedAt.Valid {
+		u.CompletedAt = &completedAt.Time
+	}
+	return &u, nil
+}
+
+func (r *UpdateRepostruct) ListBatches(updateID string) ([]model.Batch, error) {
+	rows, err := global.DB.Query(`
+		SELECT id, update_id, status, error, processed_at
+		FROM batches
+		WHERE update_id = ?
+		ORDER BY id ASC
+	`, updateID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var batches []model.Batch
+	for rows.Next() {
+		var b model.Batch
+		var processedAt sql.NullTime
+		err := rows.Scan(&b.ID, &b.UpdateID, &b.Status, &b.Error, &processedAt)
+		if err != nil {
+			return nil, err
+		}
+		if processedAt.Valid {
+			b.ProcessedAt = &processedAt.Time
+		}
+		batches = append(batches, b)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return batches, nil
+}
 func (s *UpdateRepostruct) CreateUpdateWithBatches(
 	update *model.Update,
 	batches []*model.Batch,
