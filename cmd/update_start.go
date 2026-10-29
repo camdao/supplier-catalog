@@ -21,8 +21,8 @@ var updateStartCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		println(result)
-		// printResult(result)
+
+		printUpdateResult(result)
 		return nil
 	},
 }
