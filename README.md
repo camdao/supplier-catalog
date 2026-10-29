@@ -5,12 +5,15 @@
 
 ## Features
 
-- **Idempotent imports**: Importing the same batch twice creates no duplicates
-- **Version ordering**: Older product data never overwrites newer data
-- **Withdrawal protection**: Withdrawn products stay withdrawn unless a newer version restores them
-- **Resumable updates**: Interrupted updates can be resumed without losing progress
-- **Fault tolerance**: Supplier outages or application crashes don't corrupt the existing catalog
-- **Audit trail**: Every change is recorded with version history
+### Core Guarantees
+- **Idempotent**: Import the same batch multiple times without creating duplicates
+- **Version-safe**: Older data never overwrites newer versions, even when delivered out of order
+- **Withdrawal-protected**: Withdrawn products remain withdrawn unless explicitly restored by a newer version
+- **Resumable**: Interrupted updates resume from the last completed batch, no work is lost
+
+### Operational Safety
+- **Fault-tolerant**: Supplier outages and application crashes cannot corrupt the existing catalog
+- **Auditable**: Complete change history with version tracking for every product modification
 
 
 ## Build & Run
