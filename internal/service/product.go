@@ -1,12 +1,10 @@
 package service
 
 import (
-	"catalog/global"
 	"catalog/internal/model"
 	"catalog/internal/repo"
 	"fmt"
 	"strings"
-	"time"
 )
 
 type ProductService struct {
@@ -118,67 +116,4 @@ func buildChangeDetails(existing *model.Product, item *model.BatchItem) []string
 	}
 
 	return details
-}
-
-// Batch processing
-func ProcessBatchItems(
-	updateID, batchID string,
-	items []model.BatchItem,
-) ([]model.ChangeRecord, error) {
-	tx, err := global.DB.Begin()
-	if err != nil {
-		return nil, fmt.Errorf("begin tx: %w", err)
-	}
-	defer tx.Rollback()
-
-	productIDs := make([]string, len(items))
-	for i, item := range items {
-		productIDs[i] = item.ProductID
-	}
-
-	productRepo := repo.NewProductRepo()
-	existingProducts, err := productRepo.GetProductsByIDs(tx, productIDs)
-	if err != nil {
-		return nil, fmt.Errorf("load existing products: %w", err)
-	}
-
-	now := time.Now()
-	var productsToInsert []model.Product
-	var productsToUpdate []model.Product
-	changes := make([]model.ChangeRecord, 0, len(items))
-
-	for _, item := range items {
-		existing := existingProducts[item.ProductID]
-		decision := ProcessItemDecision(item, existing)
-
-		change := model.ChangeRecord{
-			UpdateID:   updateID,
-			BatchID:    batchID,
-			ProductID:  item.ProductID,
-			ChangeType: decision.ChangeType,
-			OldVersion: decision.OldVersion,
-			NewVersion: decision.NewVersion,
-			Details:    decision.Details,
-			CreatedAt:  now,
-		}
-		changes = append(changes, change)
-
-		switch decision.Action {
-		case "insert":
-			productsToInsert = append(productsToInsert, decision.Product)
-		case "update":
-			productsToUpdate = append(productsToUpdate, decision.Product)
-		}
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("commit: %w", err)
-	}
-
-	updateRepo := repo.NewUpdateRepo()
-	if err := updateRepo.BeginBatch(updateID, batchID, productsToInsert, productsToUpdate, changes); err != nil {
-		return nil, fmt.Errorf("apply batch: %w", err)
-	}
-
-	return changes, nil
 }
